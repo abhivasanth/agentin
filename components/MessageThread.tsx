@@ -16,7 +16,7 @@ const FREE_LIMIT = 10;
 export function MessageThread({ myAgentId, otherAgentId, otherAgentName }: Props) {
   const messages = useQuery(api.messages.getThread, { agentAId: myAgentId, agentBId: otherAgentId });
   const monthlyCount = useQuery(api.messages.getMonthlyCount, { senderId: myAgentId });
-  const sendMessage = useAction(api.messages.send);
+  const sendMessage = useAction(api.messagesActions.send);
 
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
