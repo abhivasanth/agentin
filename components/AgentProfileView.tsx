@@ -1,65 +1,100 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Agent } from "@/types/agent";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useActiveAgent } from "@/components/ClientProviders";
 
-export function AgentProfileView({
-  agent,
-  myAgentId: myAgentIdProp,
-}: {
-  agent: Agent;
-  myAgentId: string | null;
-}) {
-  const [myAgentId, setMyAgentId] = useState<string | null>(myAgentIdProp);
-
-  useEffect(() => {
-    if (!myAgentId) {
-      setMyAgentId(localStorage.getItem("agentin_my_agent_id"));
-    }
-  }, []);
+export function AgentProfileView({ agent }: { agent: Agent }) {
+  const { activeAgentId: myAgentId, myAgents, addAgent, switchAgent } = useActiveAgent();
 
   const isOwnProfile = myAgentId === agent._id;
+  const isInMySwitcher = myAgents.some((a) => a.id === agent._id);
+
+  function claimAgent() {
+    addAgent({ id: agent._id, name: agent.name, avatar_emoji: agent.avatar_emoji, avatar_color: agent.avatar_color });
+    switchAgent(agent._id);
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* Banner + Avatar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-4">
-        <div className="h-24 w-full" style={{ background: `linear-gradient(135deg, ${agent.avatar_color}44, ${agent.avatar_color}22)` }} />
+      {/* Banner + Avatar card */}
+      <div
+        className="rounded-xl overflow-hidden mb-4 border"
+        style={{ background: "#0d1117", borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        {/* Banner */}
+        <div
+          className="h-24 w-full"
+          style={{
+            background: `linear-gradient(135deg, ${agent.avatar_color}33 0%, #080c14 60%, #0d1117 100%)`,
+          }}
+        />
         <div className="px-6 pb-6">
           <div className="flex items-end justify-between -mt-8 mb-4">
+            {/* Glowing ring avatar */}
             <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-4xl border-4 border-white shadow"
-              style={{ background: agent.avatar_color + "22" }}
+              className="w-20 h-20 rounded-full flex items-center justify-center text-4xl border-2"
+              style={{
+                background: "#080c14",
+                borderColor: agent.avatar_color,
+                boxShadow: `0 0 16px ${agent.avatar_color}66`,
+              }}
             >
               {agent.avatar_emoji}
             </div>
-            {!isOwnProfile && myAgentId && (
-              <div className="flex gap-2 mt-2">
-                <ConnectButton agentId={agent._id} myAgentId={myAgentId as Id<"agents">} />
-                <a
-                  href={`/messages/${agent._id}`}
-                  className="text-sm font-medium px-4 py-2 rounded-lg border"
-                  style={{ borderColor: "#0A66C2", color: "#0A66C2" }}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {!isInMySwitcher && (
+                <button
+                  type="button"
+                  onClick={claimAgent}
+                  className="text-sm font-medium px-4 py-2 rounded-lg border transition-all hover:bg-white/5"
+                  style={{ borderColor: "rgba(255,255,255,0.15)", color: "#8b949e" }}
                 >
-                  Message
-                </a>
-              </div>
-            )}
+                  + Add to my agents
+                </button>
+              )}
+              {isInMySwitcher && !isOwnProfile && (
+                <span className="text-sm px-4 py-2 rounded-lg" style={{ color: "#34d399" }}>
+                  ✓ In your switcher
+                </span>
+              )}
+              {!isOwnProfile && myAgentId && (
+                <>
+                  <ConnectButton agentId={agent._id} myAgentId={myAgentId as Id<"agents">} />
+                  <a
+                    href={`/messages/${agent._id}`}
+                    className="text-sm font-medium px-4 py-2 rounded-lg border transition-all hover:bg-white/5"
+                    style={{ borderColor: "#6366f1", color: "#818cf8" }}
+                  >
+                    Message
+                  </a>
+                </>
+              )}
+            </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900">{agent.name}</h1>
-          <p className="text-gray-500 text-sm mb-1">{agent.team_name}</p>
-          <p className="text-gray-700 mb-4">{agent.tagline}</p>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: "#f0f6fc" }}>
+            {agent.name}
+          </h1>
+          <p className="text-sm mb-1" style={{ color: "#8b949e" }}>
+            {agent.team_name}
+          </p>
+          <p className="mb-4" style={{ color: "#c9d1d9" }}>
+            {agent.tagline}
+          </p>
 
           {agent.endpoint && (
-            <div className="flex items-center gap-2 text-sm text-blue-600 mb-4">
+            <div className="flex items-center gap-2 text-sm mb-2">
               <span>🔗</span>
-              <span className="truncate">{agent.endpoint}</span>
+              <span className="truncate" style={{ color: "#818cf8" }}>
+                {agent.endpoint}
+              </span>
               <button
                 onClick={() => navigator.clipboard.writeText(agent.endpoint!)}
-                className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded px-2 py-0.5"
+                className="text-xs px-2 py-0.5 rounded border hover:bg-white/5 transition-colors flex-shrink-0"
+                style={{ borderColor: "rgba(255,255,255,0.1)", color: "#8b949e" }}
               >
                 Copy
               </button>
@@ -68,19 +103,41 @@ export function AgentProfileView({
         </div>
       </div>
 
+      {/* About */}
       {agent.about && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">About</h2>
-          <p className="text-gray-600 text-sm whitespace-pre-wrap">{agent.about}</p>
+        <div
+          className="rounded-xl p-6 mb-4 border"
+          style={{ background: "#0d1117", borderColor: "rgba(255,255,255,0.08)" }}
+        >
+          <h2 className="text-lg font-semibold mb-2" style={{ color: "#f0f6fc" }}>
+            About
+          </h2>
+          <p className="text-sm whitespace-pre-wrap" style={{ color: "#8b949e" }}>
+            {agent.about}
+          </p>
         </div>
       )}
 
+      {/* Skills */}
       {agent.skills.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Skills & Capabilities</h2>
+        <div
+          className="rounded-xl p-6 border"
+          style={{ background: "#0d1117", borderColor: "rgba(255,255,255,0.08)" }}
+        >
+          <h2 className="text-lg font-semibold mb-3" style={{ color: "#f0f6fc" }}>
+            Skills &amp; Capabilities
+          </h2>
           <div className="flex flex-wrap gap-2">
             {agent.skills.map((skill) => (
-              <span key={skill} className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+              <span
+                key={skill}
+                className="text-sm px-3 py-1 rounded-full"
+                style={{
+                  background: "#161b22",
+                  color: "#8b949e",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
                 {skill}
               </span>
             ))}
@@ -97,53 +154,56 @@ function ConnectButton({ agentId, myAgentId }: { agentId: Id<"agents">; myAgentI
   const acceptConnection = useMutation(api.connections.accept);
   const [acting, setActing] = useState(false);
 
-  if (!connections) return <button disabled className="text-sm px-4 py-2 rounded-lg bg-gray-100 text-gray-400">...</button>;
+  if (!connections)
+    return (
+      <button disabled className="text-sm px-4 py-2 rounded-lg" style={{ background: "#161b22", color: "#8b949e" }}>
+        ...
+      </button>
+    );
 
   const conn = connections.find(
-    (c) => (c.requester_id === agentId || c.receiver_id === agentId)
+    (c) => c.requester_id === agentId || c.receiver_id === agentId
   );
-
-  const status = !conn ? "none"
-    : conn.status === "accepted" ? "accepted"
-    : conn.requester_id === myAgentId ? "pending_sent"
+  const status = !conn
+    ? "none"
+    : conn.status === "accepted"
+    ? "accepted"
+    : conn.requester_id === myAgentId
+    ? "pending_sent"
     : "pending_received";
 
-  if (status === "accepted") {
-    return <button disabled className="text-sm px-4 py-2 rounded-lg bg-green-100 text-green-700 font-medium">✓ Connected</button>;
-  }
+  if (status === "accepted")
+    return (
+      <button disabled className="text-sm px-4 py-2 rounded-lg font-medium" style={{ background: "#161b22", color: "#34d399" }}>
+        ✓ Connected
+      </button>
+    );
 
-  if (status === "pending_sent") {
-    return <button disabled className="text-sm px-4 py-2 rounded-lg bg-yellow-50 text-yellow-700 font-medium">Pending...</button>;
-  }
+  if (status === "pending_sent")
+    return (
+      <button disabled className="text-sm px-4 py-2 rounded-lg" style={{ background: "#161b22", color: "#f59e0b" }}>
+        Pending…
+      </button>
+    );
 
-  if (status === "pending_received") {
+  if (status === "pending_received")
     return (
       <button
-        onClick={async () => {
-          if (!conn || acting) return;
-          setActing(true);
-          await acceptConnection({ connectionId: conn._id });
-          setActing(false);
-        }}
+        onClick={async () => { if (!conn || acting) return; setActing(true); await acceptConnection({ connectionId: conn._id }); setActing(false); }}
         disabled={acting}
-        className="text-sm px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700 font-medium"
+        className="text-sm px-4 py-2 rounded-lg font-medium"
+        style={{ background: "#161b22", color: "#f59e0b", border: "1px solid #f59e0b55" }}
       >
         Accept
       </button>
     );
-  }
 
   return (
     <button
-      onClick={async () => {
-        if (acting) return;
-        setActing(true);
-        await createConnection({ requester_id: myAgentId, receiver_id: agentId });
-        setActing(false);
-      }}
+      onClick={async () => { if (acting) return; setActing(true); await createConnection({ requester_id: myAgentId, receiver_id: agentId }); setActing(false); }}
       disabled={acting}
-      className="text-sm font-medium text-white px-4 py-2 rounded-lg"
-      style={{ background: "#0A66C2" }}
+      className="text-sm font-medium text-white px-4 py-2 rounded-lg transition-all hover:bg-indigo-400 disabled:opacity-50 bg-indigo-500"
+      style={{ boxShadow: "0 0 14px rgba(99,102,241,0.3)" }}
     >
       Connect
     </button>
