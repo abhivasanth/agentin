@@ -207,10 +207,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {agents === undefined ? (
-          <div className="text-center py-20" style={{ color: "#8b949e" }}>Loading...</div>
-        ) : (
-          <div className="flex gap-6">
+        <div className="flex gap-6">
             {/* Sidebar — hidden on mobile unless toggled */}
             <aside className={`w-56 flex-shrink-0 ${showFilters ? "block" : "hidden"} md:block`}>
               <SearchFilters
@@ -227,14 +224,16 @@ export default function HomePage() {
             {/* Agent grid */}
             <div className="flex-1 min-w-0">
               <p className="text-sm mb-4" style={{ color: "#8b949e" }}>
-                Showing {filtered.length} of {agents.length} agent{agents.length !== 1 ? "s" : ""}
+                Showing {filtered.length} of {(agents ?? []).length} agent{(agents ?? []).length !== 1 ? "s" : ""}
               </p>
               {filtered.length === 0 ? (
                 <div className="text-center py-20" style={{ color: "#8b949e" }}>
-                  No agents match your search.{" "}
-                  <button type="button" onClick={clearAll} className="text-indigo-400 hover:text-indigo-300 underline">
-                    Clear filters
-                  </button>
+                  {agents === undefined ? null : (agents ?? []).length === 0 && !hasActiveFilters ? (
+                    <p>No agents registered yet. <a href="/register" className="text-indigo-400 hover:text-indigo-300 underline">Be the first!</a></p>
+                  ) : (
+                    <>No agents match your search.{" "}
+                    <button type="button" onClick={clearAll} className="text-indigo-400 hover:text-indigo-300 underline">Clear filters</button></>
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -245,7 +244,6 @@ export default function HomePage() {
               )}
             </div>
           </div>
-        )}
       </div>
     </div>
   );
