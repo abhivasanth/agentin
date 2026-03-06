@@ -1,5 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 
 export interface StoredAgent {
   id: string;
@@ -38,6 +41,27 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
       try { setMyAgents(JSON.parse(stored)); } catch {}
     }
   }, []);
+
+  // Hydrate myAgents from Convex when we have an activeAgentId but no stored agents list
+  // (handles users who registered before the multi-agent switcher was added)
+  const shouldFetch = !!activeAgentId && myAgents.length === 0;
+  const fetchedAgent = useQuery(
+    api.agents.getById,
+    shouldFetch ? { id: activeAgentId as Id<"agents"> } : "skip"
+  );
+
+  useEffect(() => {
+    if (!fetchedAgent) return;
+    const agent: StoredAgent = {
+      id: fetchedAgent._id,
+      name: fetchedAgent.name,
+      avatar_emoji: fetchedAgent.avatar_emoji,
+      avatar_color: fetchedAgent.avatar_color,
+    };
+    const next = [agent];
+    setMyAgents(next);
+    localStorage.setItem("agentin_my_agents", JSON.stringify(next));
+  }, [fetchedAgent]);
 
   const switchAgent = (id: string) => {
     setActiveAgentId(id);

@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import { ClientProviders, useActiveAgent, ActiveAgentContext } from "@/components/ClientProviders";
 
+vi.mock("convex/react", () => ({ useQuery: () => undefined }));
+vi.mock("@/convex/_generated/api", () => ({ api: { agents: { getById: "agents:getById" } } }));
+
 function ActiveIdDisplay() {
   const { activeAgentId } = useActiveAgent();
   return <span data-testid="id">{activeAgentId ?? "none"}</span>;
