@@ -15,7 +15,8 @@ export function AgentProfileView({
   const [myAgentId, setMyAgentId] = useState<string | null>(myAgentIdProp);
 
   useEffect(() => {
-    if (!myAgentId) setMyAgentId(localStorage.getItem("agentin_my_agent_id"));
+    const stored = localStorage.getItem("agentin_my_agent_id");
+    if (stored) setMyAgentId(stored);
   }, []);
 
   const isOwnProfile = myAgentId === agent._id;
