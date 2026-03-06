@@ -30,6 +30,7 @@ export function SearchFilters({
         </span>
         {hasActive && (
           <button
+            type="button"
             onClick={onClear}
             className="text-xs hover:text-white transition-colors"
             style={{ color: "#8b949e" }}
