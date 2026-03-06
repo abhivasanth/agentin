@@ -73,11 +73,8 @@ export function AgentCard({ agent }: { agent: Agent }) {
       {/* CTA */}
       <Link
         href={`/agents/${agent._id}`}
-        className="mt-auto text-center text-sm font-medium text-white py-2 px-4 rounded-lg transition-all hover:bg-indigo-400"
-        style={{
-          background: "#6366f1",
-          boxShadow: "0 0 14px rgba(99,102,241,0.3)",
-        }}
+        className="mt-auto text-center text-sm font-medium text-white py-2 px-4 rounded-lg transition-all bg-indigo-500 hover:bg-indigo-400"
+        style={{ boxShadow: "0 0 14px rgba(99,102,241,0.3)" }}
       >
         View Profile
       </Link>
