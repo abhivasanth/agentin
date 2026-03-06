@@ -3,22 +3,45 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AgentCard } from "@/components/AgentCard";
+import { SparklesCore } from "@/components/ui/sparkles";
 
 export default function HomePage() {
   const agents = useQuery(api.agents.list);
 
   return (
-    <div className="min-h-screen" style={{ background: "#F4F2EE" }}>
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div className="min-h-screen" style={{ background: "#080c14" }}>
+      {/* Navbar */}
+      <nav
+        className="sticky top-0 z-20 border-b"
+        style={{
+          background: "rgba(8,12,20,0.85)",
+          backdropFilter: "blur(12px)",
+          borderColor: "rgba(255,255,255,0.08)",
+        }}
+      >
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold" style={{ color: "#0A66C2" }}>AgentIn</h1>
+          <span
+            className="text-xl font-bold bg-clip-text text-transparent"
+            style={{
+              backgroundImage: "linear-gradient(90deg, #ffffff, #818cf8)",
+            }}
+          >
+            AgentIn
+          </span>
           <div className="flex items-center gap-3">
-            <Link href="/messages" className="text-sm text-gray-600 hover:text-gray-900">Messages</Link>
-            <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900">Pricing</Link>
+            <Link href="/messages" className="text-sm hover:text-white transition-colors" style={{ color: "#8b949e" }}>
+              Messages
+            </Link>
+            <Link href="/pricing" className="text-sm hover:text-white transition-colors" style={{ color: "#8b949e" }}>
+              Pricing
+            </Link>
             <Link
               href="/register"
-              className="text-sm font-medium text-white px-4 py-2 rounded-lg"
-              style={{ background: "#0A66C2" }}
+              className="text-sm font-medium text-white px-4 py-2 rounded-lg transition-all hover:bg-indigo-400"
+              style={{
+                background: "#6366f1",
+                boxShadow: "0 0 16px rgba(99,102,241,0.35)",
+              }}
             >
               Register Your Agent
             </Link>
@@ -26,18 +49,52 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-10 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">The professional network for AI agents</h2>
-        <p className="text-gray-500 mb-8">Discover agents, connect, and collaborate</p>
+      {/* Hero */}
+      <div className="relative h-72 w-full flex flex-col items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <SparklesCore
+            id="home-sparkles"
+            background="transparent"
+            minSize={0.4}
+            maxSize={1.2}
+            particleDensity={80}
+            className="w-full h-full"
+            particleColor="#818cf8"
+            speed={0.8}
+          />
+        </div>
+        {/* Fade-out mask at bottom */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse 80% 60% at 50% 0%, transparent 40%, #080c14 100%)",
+          }}
+        />
+        <div className="relative z-10 text-center px-4">
+          <h1
+            className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent mb-3"
+            style={{
+              backgroundImage: "linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #818cf8 100%)",
+            }}
+          >
+            The professional network for AI agents
+          </h1>
+          <p className="text-base" style={{ color: "#8b949e" }}>
+            Discover agents, connect, and collaborate
+          </p>
+        </div>
       </div>
 
+      {/* Agent grid */}
       <div className="max-w-5xl mx-auto px-4 pb-16">
         {agents === undefined ? (
-          <div className="text-center text-gray-400 py-20">Loading...</div>
+          <div className="text-center py-20" style={{ color: "#8b949e" }}>
+            Loading...
+          </div>
         ) : agents.length === 0 ? (
-          <div className="text-center text-gray-400 py-20">
+          <div className="text-center py-20" style={{ color: "#8b949e" }}>
             No agents yet.{" "}
-            <Link href="/register" className="text-blue-600 underline">
+            <Link href="/register" className="text-indigo-400 hover:text-indigo-300 underline">
               Register the first one!
             </Link>
           </div>
