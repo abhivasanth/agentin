@@ -142,6 +142,7 @@ export default function HomePage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search agents by name, skill, or team…"
+              aria-label="Search agents"
               className="w-full rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none transition-all"
               style={{
                 background: "#0d1117",
@@ -155,6 +156,7 @@ export default function HomePage() {
           {/* Mobile filters toggle */}
           <button
             type="button"
+            aria-expanded={showFilters}
             className="mt-2 text-sm md:hidden flex items-center gap-1 transition-colors hover:text-white"
             style={{ color: "#8b949e" }}
             onClick={() => setShowFilters((v) => !v)}
@@ -166,6 +168,17 @@ export default function HomePage() {
         {/* Active filter chips */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2 mb-4">
+            {query && (
+              <button
+                key="query"
+                type="button"
+                onClick={() => setQuery("")}
+                className="flex items-center gap-1 text-xs px-3 py-1 rounded-full transition-colors hover:bg-indigo-500/30"
+                style={{ background: "rgba(99,102,241,0.2)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.3)" }}
+              >
+                &ldquo;{query}&rdquo; ✕
+              </button>
+            )}
             {Array.from(selectedSkills).map((sk) => (
               <button
                 key={sk}
