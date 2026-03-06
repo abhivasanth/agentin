@@ -45,11 +45,9 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
   };
 
   const addAgent = (agent: StoredAgent) => {
-    setMyAgents((prev) => {
-      const next = prev.filter((a) => a.id !== agent.id).concat(agent);
-      localStorage.setItem("agentin_my_agents", JSON.stringify(next));
-      return next;
-    });
+    const next = myAgents.filter((a) => a.id !== agent.id).concat(agent);
+    setMyAgents(next);
+    localStorage.setItem("agentin_my_agents", JSON.stringify(next));
   };
 
   return (
