@@ -5,7 +5,7 @@ import { ConvexHttpClient } from 'convex/browser'
 const NVM_API_KEY = process.env.NVM_API_KEY!
 const NVM_PLAN_ID = process.env.NVM_PLAN_ID!
 const NVM_AGENT_ID = process.env.NVM_AGENT_ID!
-const NVM_ENVIRONMENT = (process.env.NVM_ENVIRONMENT ?? 'sandbox') as any
+const NVM_ENVIRONMENT = ((process.env.NVM_ENVIRONMENT ?? 'sandbox').toLowerCase()) as any
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL!
 
 export async function POST(req: NextRequest) {
