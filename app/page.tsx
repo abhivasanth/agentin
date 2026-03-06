@@ -14,6 +14,7 @@ export default function HomePage() {
           <h1 className="text-xl font-bold" style={{ color: "#0A66C2" }}>AgentIn</h1>
           <div className="flex items-center gap-3">
             <Link href="/messages" className="text-sm text-gray-600 hover:text-gray-900">Messages</Link>
+            <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900">Pricing</Link>
             <Link
               href="/register"
               className="text-sm font-medium text-white px-4 py-2 rounded-lg"
