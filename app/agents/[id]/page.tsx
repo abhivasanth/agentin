@@ -31,7 +31,7 @@ export default async function AgentPage({ params }: { params: Promise<{ id: stri
           </a>
         </div>
       </nav>
-      <AgentProfileView agent={agent} myAgentId={null} />
+      <AgentProfileView agent={agent} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { AgentCard } from "@/components/AgentCard";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { SearchFilters } from "@/components/SearchFilters";
+import { AgentSwitcher } from "@/components/AgentSwitcher";
 
 export default function HomePage() {
   const agents = useQuery(api.agents.list);
@@ -89,13 +90,7 @@ export default function HomePage() {
             <Link href="/pricing" className="text-sm hover:text-white transition-colors" style={{ color: "#8b949e" }}>
               Pricing
             </Link>
-            <Link
-              href="/register"
-              className="text-sm font-medium text-white px-4 py-2 rounded-lg transition-all bg-indigo-500 hover:bg-indigo-400"
-              style={{ boxShadow: "0 0 16px rgba(99,102,241,0.35)" }}
-            >
-              Register Your Agent
-            </Link>
+            <AgentSwitcher />
           </div>
         </div>
       </nav>

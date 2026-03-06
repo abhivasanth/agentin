@@ -1,23 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Agent } from "@/types/agent";
 import type { Id } from "@/convex/_generated/dataModel";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useActiveAgent } from "@/components/ClientProviders";
 
-export function AgentProfileView({
-  agent,
-  myAgentId: myAgentIdProp,
-}: {
-  agent: Agent;
-  myAgentId: string | null;
-}) {
-  const [myAgentId, setMyAgentId] = useState<string | null>(myAgentIdProp);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("agentin_my_agent_id");
-    if (stored) setMyAgentId(stored);
-  }, []);
+export function AgentProfileView({ agent }: { agent: Agent }) {
+  const { activeAgentId: myAgentId } = useActiveAgent();
 
   const isOwnProfile = myAgentId === agent._id;
 

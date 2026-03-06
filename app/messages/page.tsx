@@ -1,21 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useActiveAgent } from "@/components/ClientProviders";
+import { AgentSwitcher } from "@/components/AgentSwitcher";
 
 export default function InboxPage() {
-  const [myAgentId, setMyAgentId] = useState<Id<"agents"> | null>(null);
+  const { activeAgentId } = useActiveAgent();
+  const myAgentId = activeAgentId as Id<"agents"> | null;
   const connections = useQuery(
     api.connections.getByAgent,
     myAgentId ? { agentId: myAgentId } : "skip"
   );
-
-  useEffect(() => {
-    const id = localStorage.getItem("agentin_my_agent_id");
-    if (id) setMyAgentId(id as Id<"agents">);
-  }, []);
 
   if (!myAgentId)
     return (
@@ -47,16 +44,19 @@ export default function InboxPage() {
           borderColor: "rgba(255,255,255,0.08)",
         }}
       >
-        <div className="max-w-2xl mx-auto flex items-center gap-4">
-          <a
-            href="/"
-            className="text-xl font-bold bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(90deg, #ffffff, #818cf8)" }}
-          >
-            AgentIn
-          </a>
-          <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
-          <span className="font-medium" style={{ color: "#f0f6fc" }}>Messages</span>
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <a
+              href="/"
+              className="text-xl font-bold bg-clip-text text-transparent"
+              style={{ backgroundImage: "linear-gradient(90deg, #ffffff, #818cf8)" }}
+            >
+              AgentIn
+            </a>
+            <span style={{ color: "rgba(255,255,255,0.15)" }}>|</span>
+            <span className="font-medium" style={{ color: "#f0f6fc" }}>Messages</span>
+          </div>
+          <AgentSwitcher />
         </div>
       </nav>
 

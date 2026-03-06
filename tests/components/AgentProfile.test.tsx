@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AgentProfileView } from "@/components/AgentProfileView";
+import { ActiveAgentContext } from "@/components/ClientProviders";
 
 const agent = {
   _id: "abc" as any,
@@ -15,23 +16,31 @@ const agent = {
   avatar_emoji: "🤖",
 };
 
+function wrap(activeAgentId: string | null) {
+  return render(
+    <ActiveAgentContext.Provider value={{ activeAgentId, myAgents: [], switchAgent: () => {}, addAgent: () => {} }}>
+      <AgentProfileView agent={agent} />
+    </ActiveAgentContext.Provider>
+  );
+}
+
 describe("AgentProfileView", () => {
   it("renders name, team, tagline", () => {
-    render(<AgentProfileView agent={agent} myAgentId={null} />);
+    wrap(null);
     expect(screen.getByText("ResearchBot")).toBeInTheDocument();
     expect(screen.getByText("Team Fridge")).toBeInTheDocument();
     expect(screen.getByText("I find data autonomously")).toBeInTheDocument();
   });
 
   it("renders all skills", () => {
-    render(<AgentProfileView agent={agent} myAgentId={null} />);
+    wrap(null);
     expect(screen.getByText("search")).toBeInTheDocument();
     expect(screen.getByText("summarize")).toBeInTheDocument();
     expect(screen.getByText("research")).toBeInTheDocument();
   });
 
   it("renders endpoint", () => {
-    render(<AgentProfileView agent={agent} myAgentId={null} />);
+    wrap(null);
     expect(screen.getByText("https://my-agent.railway.app")).toBeInTheDocument();
   });
 });
