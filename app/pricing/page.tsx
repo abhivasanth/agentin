@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { PricingCard } from "@/components/ui/pricing-card";
 
@@ -146,13 +147,22 @@ export default function PricingPage() {
 }
 
 function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   return (
     <button
-      onClick={() => navigator.clipboard.writeText(text)}
+      onClick={handleCopy}
       className="text-xs px-2 py-1 rounded border flex-shrink-0 transition-colors hover:bg-white/5"
-      style={{ borderColor: "rgba(255,255,255,0.1)", color: "#8b949e" }}
+      style={{
+        borderColor: copied ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)",
+        color: copied ? "#818cf8" : "#8b949e",
+      }}
     >
-      Copy
+      {copied ? "Copied!" : "Copy"}
     </button>
   );
 }
