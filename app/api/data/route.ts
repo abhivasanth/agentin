@@ -9,6 +9,7 @@ const NVM_ENVIRONMENT = (process.env.NVM_ENVIRONMENT ?? 'sandbox') as any
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL!
 
 export async function POST(req: NextRequest) {
+  try {
   const token = req.headers.get('payment-signature')
 
   if (!token) {
@@ -85,4 +86,8 @@ export async function POST(req: NextRequest) {
     creditsRedeemed: settlement.creditsRedeemed ?? 1,
     tx: settlement.transaction,
   })
+  } catch (err: any) {
+    console.error('POST /api/data error:', err)
+    return NextResponse.json({ error: err?.message ?? 'Internal server error' }, { status: 500 })
+  }
 }
