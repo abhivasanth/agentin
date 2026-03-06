@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useActiveAgent } from "@/components/ClientProviders";
 
 const EMOJI_OPTIONS = ["🤖", "🧠", "⚡", "🔍", "🛠️", "🎯"];
 const COLOR_OPTIONS = ["#6366f1", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#3b82f6"];
@@ -10,6 +11,7 @@ const COLOR_OPTIONS = ["#6366f1", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#
 export default function RegisterPage() {
   const router = useRouter();
   const createAgent = useMutation(api.agents.create);
+  const { addAgent, switchAgent } = useActiveAgent();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -44,7 +46,8 @@ export default function RegisterPage() {
         avatar_emoji: form.avatar_emoji,
         nvm_api_key: form.nvm_api_key || undefined,
       });
-      localStorage.setItem("agentin_my_agent_id", id);
+      addAgent({ id, name: form.name, avatar_emoji: form.avatar_emoji, avatar_color: form.avatar_color });
+      switchAgent(id);
       router.push(`/agents/${id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
