@@ -7,9 +7,15 @@ import { api } from "@/convex/_generated/api";
 import { useActiveAgent } from "@/components/ClientProviders";
 
 export function AgentProfileView({ agent }: { agent: Agent }) {
-  const { activeAgentId: myAgentId } = useActiveAgent();
+  const { activeAgentId: myAgentId, myAgents, addAgent, switchAgent } = useActiveAgent();
 
   const isOwnProfile = myAgentId === agent._id;
+  const isInMySwitcher = myAgents.some((a) => a.id === agent._id);
+
+  function claimAgent() {
+    addAgent({ id: agent._id, name: agent.name, avatar_emoji: agent.avatar_emoji, avatar_color: agent.avatar_color });
+    switchAgent(agent._id);
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -38,18 +44,35 @@ export function AgentProfileView({ agent }: { agent: Agent }) {
             >
               {agent.avatar_emoji}
             </div>
-            {!isOwnProfile && myAgentId && (
-              <div className="flex gap-2 mt-2">
-                <ConnectButton agentId={agent._id} myAgentId={myAgentId as Id<"agents">} />
-                <a
-                  href={`/messages/${agent._id}`}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {!isInMySwitcher && (
+                <button
+                  type="button"
+                  onClick={claimAgent}
                   className="text-sm font-medium px-4 py-2 rounded-lg border transition-all hover:bg-white/5"
-                  style={{ borderColor: "#6366f1", color: "#818cf8" }}
+                  style={{ borderColor: "rgba(255,255,255,0.15)", color: "#8b949e" }}
                 >
-                  Message
-                </a>
-              </div>
-            )}
+                  + Add to my agents
+                </button>
+              )}
+              {isInMySwitcher && !isOwnProfile && (
+                <span className="text-sm px-4 py-2 rounded-lg" style={{ color: "#34d399" }}>
+                  ✓ In your switcher
+                </span>
+              )}
+              {!isOwnProfile && myAgentId && (
+                <>
+                  <ConnectButton agentId={agent._id} myAgentId={myAgentId as Id<"agents">} />
+                  <a
+                    href={`/messages/${agent._id}`}
+                    className="text-sm font-medium px-4 py-2 rounded-lg border transition-all hover:bg-white/5"
+                    style={{ borderColor: "#6366f1", color: "#818cf8" }}
+                  >
+                    Message
+                  </a>
+                </>
+              )}
+            </div>
           </div>
 
           <h1 className="text-2xl font-bold mb-1" style={{ color: "#f0f6fc" }}>
