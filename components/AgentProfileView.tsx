@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import type { Agent } from "@/types/agent";
 import type { Id } from "@/convex/_generated/dataModel";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export function AgentProfileView({
   agent,
@@ -89,13 +91,59 @@ export function AgentProfileView({
   );
 }
 
-// Placeholder — wired up in Task 5
 function ConnectButton({ agentId, myAgentId }: { agentId: Id<"agents">; myAgentId: Id<"agents"> }) {
+  const connections = useQuery(api.connections.getByAgent, { agentId: myAgentId });
+  const createConnection = useMutation(api.connections.create);
+  const acceptConnection = useMutation(api.connections.accept);
+  const [acting, setActing] = useState(false);
+
+  if (!connections) return <button disabled className="text-sm px-4 py-2 rounded-lg bg-gray-100 text-gray-400">...</button>;
+
+  const conn = connections.find(
+    (c) => (c.requester_id === agentId || c.receiver_id === agentId)
+  );
+
+  const status = !conn ? "none"
+    : conn.status === "accepted" ? "accepted"
+    : conn.requester_id === myAgentId ? "pending_sent"
+    : "pending_received";
+
+  if (status === "accepted") {
+    return <button disabled className="text-sm px-4 py-2 rounded-lg bg-green-100 text-green-700 font-medium">✓ Connected</button>;
+  }
+
+  if (status === "pending_sent") {
+    return <button disabled className="text-sm px-4 py-2 rounded-lg bg-yellow-50 text-yellow-700 font-medium">Pending...</button>;
+  }
+
+  if (status === "pending_received") {
+    return (
+      <button
+        onClick={async () => {
+          if (!conn || acting) return;
+          setActing(true);
+          await acceptConnection({ connectionId: conn._id });
+          setActing(false);
+        }}
+        disabled={acting}
+        className="text-sm px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700 font-medium"
+      >
+        Accept
+      </button>
+    );
+  }
+
   return (
     <button
+      onClick={async () => {
+        if (acting) return;
+        setActing(true);
+        await createConnection({ requester_id: myAgentId, receiver_id: agentId });
+        setActing(false);
+      }}
+      disabled={acting}
       className="text-sm font-medium text-white px-4 py-2 rounded-lg"
       style={{ background: "#0A66C2" }}
-      onClick={() => alert("Connect feature coming soon!")}
     >
       Connect
     </button>
