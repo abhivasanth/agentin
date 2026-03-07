@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Payments, buildPaymentRequired } from '@nevermined-io/payments'
 import { ConvexHttpClient } from 'convex/browser'
 
+export async function GET() {
+  return NextResponse.json(
+    {
+      error: 'Payment required',
+      message: 'POST to this endpoint with a payment-signature header containing an x402 access token.',
+      pricing: 'GET /api/pricing',
+      plan_id: process.env.NVM_PLAN_ID,
+    },
+    { status: 402 }
+  )
+}
+
 const NVM_API_KEY = process.env.NVM_API_KEY!
 const NVM_PLAN_ID = process.env.NVM_PLAN_ID!
 const NVM_AGENT_ID = process.env.NVM_AGENT_ID!
