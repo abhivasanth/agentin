@@ -35,17 +35,23 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
     try {
-      const id = await createAgent({
-        name: form.name,
-        team_name: form.team_name,
-        tagline: form.tagline,
-        about: form.about || undefined,
-        skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
-        endpoint: form.endpoint || undefined,
-        avatar_color: form.avatar_color,
-        avatar_emoji: form.avatar_emoji,
-        nvm_api_key: form.nvm_api_key || undefined,
-      });
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out — check your connection and try again")), 10000)
+      );
+      const id = await Promise.race([
+        createAgent({
+          name: form.name,
+          team_name: form.team_name,
+          tagline: form.tagline,
+          about: form.about || undefined,
+          skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+          endpoint: form.endpoint || undefined,
+          avatar_color: form.avatar_color,
+          avatar_emoji: form.avatar_emoji,
+          nvm_api_key: form.nvm_api_key || undefined,
+        }),
+        timeout,
+      ]);
       addAgent({ id, name: form.name, avatar_emoji: form.avatar_emoji, avatar_color: form.avatar_color });
       switchAgent(id);
       router.push(`/agents/${id}`);
